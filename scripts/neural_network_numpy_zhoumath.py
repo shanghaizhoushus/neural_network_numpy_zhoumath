@@ -73,8 +73,8 @@ class NeuralNetworkNumpyZhoumath:
         :param learning_rate: float, learning rate used for training the model.
         :param n_iters: int, the number of iterations (epochs) to train the model.
         :param dim_hiddens: list of int, the number of neurons in each hidden layer.
-        :param beta1: float, the exponential decay rate for the first moment estimate in Adam optimizer (default is 0.9).
-        :param beta2: float, the exponential decay rate for the second moment estimate in Adam optimizer (default is 0.999).
+        :param beta1: float, the exponential decay rate for the first moment estimate in Adam optimizer.
+        :param beta2: float, the exponential decay rate for the second moment estimate in Adam optimizer.
         :param batch_size: int or None, the size of each mini-batch. If None, the model will use full-batch training.
         """
         self.learning_rate = learning_rate
@@ -139,7 +139,7 @@ class NeuralNetworkNumpyZhoumath:
             
         
         self._remove_grads()
-
+    
     @staticmethod
     def _standardlize(X):
         """
@@ -204,7 +204,6 @@ class NeuralNetworkNumpyZhoumath:
                  inputs_gradients is the list of gradients for each layer,
                  logodds is the final log-odds values for the output layer.
         """
-        
         inputs = [X_train]
         inputs_gradients = [np.zeros((X_train.shape))]
         
@@ -233,19 +232,20 @@ class NeuralNetworkNumpyZhoumath:
             self.biases[i] -= self.learning_rate * self.biases_optimizers[i]._renew(self.biases_gradients[i])
             inputs_gradients[i] = np.dot(inputs_gradients[i+1], np.ascontiguousarray(self.linears[i].T))
             inputs_gradients[i] = inputs_gradients[i] * (inputs[i] > 0).astype(np.float64)
-        
+    
     def _remove_grads(self):
         """
         Remove the gradients of the model when train ends to reduce the size of the model.
         """
-        (self.linears_gradients, self.biases_gradients, self.linears_optimizers, self.biases_optimizers) = tuple([None] * 4)
+        (self.linears_gradients, self.biases_gradients,
+         self.linears_optimizers, self.biases_optimizers) = tuple([None] * 4)
     
     def predict(self, X_test):
         """
         Predict the class probabilities for the given test data.
         
         :param X_test: ndarray, shape (n_samples, n_features), the test feature matrix.
-        :return: ndarray, shape (n_samples, 2), predicted class probabilities for each sample (negative class, positive class).
+        :return: ndarray, shape (n_samples, 2), predicted class probabilities for each sample (negative, positive).
         """
         X_test = NeuralNetworkNumpyZhoumath._standardlize(X_test)
         _, _, logodds = self._forward(X_test)
