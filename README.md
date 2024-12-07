@@ -1,6 +1,6 @@
 # Neural Network Numpy Zhoumath - Zhoushus (v0.1.2)
 
-This repository contains a custom implementation of nerual network for binary classification using Numpy, featuring various optimization techniques like gradient descent, mini-batch training, learning rate decay, and the Adam optimizer. The project includes practical examples for applying the model to real-world datasets.
+This repository contains a custom implementation of nerual network for binary classification using Numpy which includes practical examples for applying the model to real-world datasets.
 
 ## Features
 - **Custom Neural Network Implementation**: A nerual network model implemented with Numpy, allowing for a deeper understanding of machine learning fundamentals.
