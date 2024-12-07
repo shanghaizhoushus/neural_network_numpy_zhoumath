@@ -7,6 +7,7 @@ Created on Sat Dec  7 15:57:45 2024
 
 #Import packages
 import numpy as np
+import pickle
 from neural_network_numpy_helpers_zhoumath import Earlystopper, AdamOptimizer
 
 class NeuralNetworkNumpyZhoumath:
@@ -58,8 +59,12 @@ class NeuralNetworkNumpyZhoumath:
         Performs the forward pass to calculate the log-odds and activations for each layer.
     _backward(inputs, inputs_gradients, residuals)
         Performs the backward pass to compute gradients and update the weights and biases.
+    _remove_grads(inputs, inputs_gradients, residuals)
+        Remove the gradients when train ends.
     predict(X_test)
         Makes predictions for the given test data by calculating the class probabilities.
+    to_pkl(model_name)
+        Save the model object as a pickle file.
     """
     def __init__(self, learning_rate, n_iters, dim_hiddens, beta1=0.9, beta2=0.999, batch_size=None):
         """
@@ -83,7 +88,7 @@ class NeuralNetworkNumpyZhoumath:
             decay_rounds=None, verbose=False, random_seed=42):
         """
         Train the neural network model on the given training data.
-
+        
         :param X_train: ndarray, shape (n_samples, n_features), training feature matrix.
         :param y_train: ndarray, shape (n_samples, 1), training labels.
         :param X_val: ndarray, shape (n_samples, n_features), optional, validation feature matrix for early stopping.
@@ -109,6 +114,7 @@ class NeuralNetworkNumpyZhoumath:
             self.current_batch = 0
         
         for i in range(self.n_iters):
+            
             if self.batch_size is None:
                 inputs, inputs_gradients, logodds = self._forward(X_train)
                 predicts = 1 / (1 + np.exp(-logodds))
@@ -127,16 +133,18 @@ class NeuralNetworkNumpyZhoumath:
                 if (linears_cache is not None) and (biases_cache is not None):
                     self.linears = linears_cache
                     self.biaes = biases_cache
+                    self._remove_grads()
                     return
                 
             
         
-    
+        self._remove_grads()
+
     @staticmethod
     def _standardlize(X):
         """
         Standardize the input data by removing the mean and scaling to unit variance.
-
+        
         :param X: ndarray, shape (n_samples, n_features), the input feature matrix to standardize.
         :return: ndarray, shape (n_samples, n_features), the standardized feature matrix.
         """
@@ -146,7 +154,7 @@ class NeuralNetworkNumpyZhoumath:
     def _init_weights(self, X):
         """
         Initialize the model weights and biases using a normal distribution.
-
+        
         :param X: ndarray, shape (n_samples, n_features), the input feature matrix to determine the input dimension.
         """
         self.dims = [X.shape[1]] + self.dim_hiddens + [1]
@@ -168,6 +176,7 @@ class NeuralNetworkNumpyZhoumath:
     def _get_batch(self, X_train, y_train):
         """
         Retrieve the next batch of training data and residuals for mini-batch training.
+        
         :param X_train: Full training feature matrix.
         :param y_train: Full training label matrix.
         :return: Batch of training features and corresponding residuals.
@@ -188,7 +197,7 @@ class NeuralNetworkNumpyZhoumath:
     def _forward(self, X_train):
         """
         Perform the forward pass through the network to compute log-odds.
-
+        
         :param X_train: ndarray, shape (n_samples, n_features), the input feature matrix.
         :return: tuple of (inputs, inputs_gradients, logodds), where:
                  inputs is the list of activations for each layer,
@@ -210,30 +219,31 @@ class NeuralNetworkNumpyZhoumath:
     def _backward(self, inputs, inputs_gradients, residuals):
         """
         Perform the backward pass to update weights and biases based on gradients.
-
+        
         :param inputs: list of ndarray, intermediate activations from the forward pass.
         :param inputs_gradients: list of ndarray, gradients of activations for each layer.
         :param residuals: ndarray, shape (n_samples, 1), the residuals (predictions - true labels).
         """
-        self.linears_gradients[-1] = np.dot(np.ascontiguousarray(inputs[-1].T), residuals)
-        self.linears[-1] -= self.learning_rate * self.linears_optimizers[-1]._renew(self.linears_gradients[-1])
-        self.biases_gradients[-1] = np.dot(np.ones((1, residuals.shape[0])), residuals)
-        self.biases[-1] -= self.learning_rate * self.biases_optimizers[-1]._renew(self.biases_gradients[-1])
-        inputs_gradients[-1] = np.dot(residuals, np.ascontiguousarray(self.linears[-1].T))
-        inputs_gradients[-1] = inputs_gradients[-1] * (inputs[-1] > 0).astype(np.float64)
+        inputs_gradients.append(residuals)
         
-        for i in range(len(self.dims) - 2)[::-1]:
+        for i in range(len(self.dims) - 1)[::-1]:
             self.linears_gradients[i] = np.dot(np.ascontiguousarray(inputs[i].T), inputs_gradients[i+1])
             self.linears[i] -= self.learning_rate * self.linears_optimizers[i]._renew(self.linears_gradients[i])
             self.biases_gradients[i] = np.dot(np.ones((1, inputs_gradients[i+1].shape[0])), inputs_gradients[i+1])
             self.biases[i] -= self.learning_rate * self.biases_optimizers[i]._renew(self.biases_gradients[i])
             inputs_gradients[i] = np.dot(inputs_gradients[i+1], np.ascontiguousarray(self.linears[i].T))
             inputs_gradients[i] = inputs_gradients[i] * (inputs[i] > 0).astype(np.float64)
+        
+    def _remove_grads(self):
+        """
+        Remove the gradients of the model when train ends to reduce the size of the model.
+        """
+        (self.linears_gradients, self.biases_gradients, self.linears_optimizers, self.biases_optimizers) = tuple([None] * 4)
     
     def predict(self, X_test):
         """
         Predict the class probabilities for the given test data.
-
+        
         :param X_test: ndarray, shape (n_samples, n_features), the test feature matrix.
         :return: ndarray, shape (n_samples, 2), predicted class probabilities for each sample (negative class, positive class).
         """
@@ -241,3 +251,12 @@ class NeuralNetworkNumpyZhoumath:
         _, _, logodds = self._forward(X_test)
         predicts = 1 / (1 + np.exp(-logodds))
         return np.hstack([1 - predicts, predicts])
+    
+    def to_pkl(self, model_name):
+        """
+        Save the model object as a pickle file.
+        
+        :param X_test: ndarray, shape (n_samples, n_features), the test feature matrix.
+        """
+        with open(model_name, "wb") as f:
+            pickle.dump(self, f)

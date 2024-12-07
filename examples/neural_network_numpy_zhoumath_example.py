@@ -11,6 +11,7 @@ import os
 import time
 import warnings
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -40,7 +41,7 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 learning_rate = 0.01
 n_iters = 10000
 batch_size = 256
-dim_hiddens = [64, 32]
+dim_hiddens = [128, 128, 32]
 neural_network_model = NeuralNetworkNumpyZhoumath(learning_rate=learning_rate,
                                                   n_iters=n_iters,
                                                   dim_hiddens=dim_hiddens,
@@ -55,7 +56,7 @@ neural_network_model.fit(X_train=X_train,
                          verbose=50)
 toc = time.time()
 gap = toc-tic
-print(f'The decision-tree-zhoumath-with-null-zhoumath model is bulit in {gap:.5f} seconds.')
+print(f'The decision-tree-zhoumath-with-null-zhoumath model is bulit in {gap:.4f} seconds.')
 
 # Predict
 X_test = np.array(X_test)
@@ -63,7 +64,7 @@ tic = time.time()
 y_test_pred = neural_network_model.predict(X_test)[:, 1]
 toc = time.time()
 gap = toc-tic
-print(f'The decision-tree-with-null-zhoumath model is predicted in {gap:.5f} seconds.')
+print(f'The decision-tree-with-null-zhoumath model is predicted in {gap:.44f} seconds.')
 auc_score = roc_auc_score(y_test, y_test_pred)
 fpr, tpr, _ = roc_curve(y_test, y_test_pred)
 ks = tpr[abs(tpr - fpr).argmax()] - fpr[abs(tpr - fpr).argmax()]
@@ -77,6 +78,20 @@ plt.plot(
     np.linspace(fpr[abs(tpr - fpr).argmax()], tpr[abs(tpr - fpr).argmax()], len(fpr)),
     "--",
 )
-plt.title("ROC Curve of Decision Tree")
+plt.title("ROC Curve of the Neural Network for test set")
 plt.legend()
 plt.show()
+
+# Plot the histogram of the weights of the model
+for i in range(len(neural_network_model.linears)):
+    linear = neural_network_model.linears[i].flatten()
+    plt.hist(linear, bins = int(linear.shape[0])//100 + 10)
+    plt.title(f"The histogram of the weights in linear {i} of the model")
+    plt.show()
+    bias = neural_network_model.biases[i].flatten()
+    plt.hist(bias, bins = int(bias.shape[0])//100 + 10)
+    plt.title(f"The histogram of the weights in bias {i} of the model")
+    plt.show()
+
+# Save model to pkl
+neural_network_model.to_pkl("neural_network_model_zhoumath.pkl")

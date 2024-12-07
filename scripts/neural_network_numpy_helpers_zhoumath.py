@@ -44,7 +44,7 @@ class Earlystopper:
     def __init__(self, early_stop_rounds, n_iters, decay_rounds, verbose):
         """
         Initialize the Earlystopper with early stopping and learning rate decay settings.
-
+        
         :param early_stop_rounds: int, the number of rounds to wait for improvement before stopping.
         :param n_iters: int, the total number of training iterations.
         :param decay_rounds: int, the number of rounds before triggering learning rate decay.
@@ -62,7 +62,7 @@ class Earlystopper:
     def _evaluate_early_stop(self, model, X_train, y_train, X_val, y_val):
         """
         Evaluate model performance and determine whether to apply early stopping or learning rate decay.
-
+        
         :param model: object, the model being trained.
         :param X_train: ndarray, training features.
         :param y_train: ndarray, training labels.
@@ -81,7 +81,7 @@ class Earlystopper:
         _, _, val_logodds = model._forward(X_val)
         val_predicts = 1 / (1 + np.exp(-val_logodds))
         val_auc = roc_auc_score(y_val, val_predicts)
-
+        
         if (self.verbose) and (self.current_round % self.verbose) == 0:
             print(f"Current round: {self.current_round}\t"
                   f"Train AUC: {train_auc:.4f}\t"
@@ -118,7 +118,6 @@ class Earlystopper:
         
         return None, None
 
-#AdamOptimizer Class
 class AdamOptimizer:
     """
     A class to implement the Adam optimizer for gradient-based optimization of the model's parameters.
@@ -144,7 +143,7 @@ class AdamOptimizer:
     def __init__(self, beta1, beta2, shape):
         """
         Initialize the Adam optimizer with hyperparameters and initial values.
-
+        
         :param beta1: float, the exponential decay rate for the first moment estimate.
         :param beta2: float, the exponential decay rate for the second moment estimate.
         :param shape: tuple, the shape of the model parameters (weights) to be optimized.
@@ -158,7 +157,7 @@ class AdamOptimizer:
     def _renew(self, gradient):
         """
         Update the model parameters using the provided gradient, according to the Adam update rule.
-
+        
         :param gradient: ndarray, the gradient of the objective function with respect to the parameters.
         :return: ndarray, the updated parameter values after applying the Adam update rule.
         """
