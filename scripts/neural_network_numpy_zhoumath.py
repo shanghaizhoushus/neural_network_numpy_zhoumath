@@ -256,7 +256,7 @@ class NeuralNetworkNumpyZhoumath:
         """
         Save the model object as a pickle file.
         
-        :param X_test: ndarray, shape (n_samples, n_features), the test feature matrix.
+        :param model_name: String, the name of the pickle file.
         """
         with open(model_name, "wb") as f:
             pickle.dump(self, f)

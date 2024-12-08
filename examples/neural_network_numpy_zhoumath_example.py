@@ -38,10 +38,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=42)
 
 # Fit model
-learning_rate = 0.01
+learning_rate = 0.001
 n_iters = 10000
 batch_size = 256
-dim_hiddens = [128, 128, 32]
+dim_hiddens = [256, 128, 32]
 neural_network_model = NeuralNetworkNumpyZhoumath(learning_rate=learning_rate,
                                                   n_iters=n_iters,
                                                   dim_hiddens=dim_hiddens,
@@ -56,7 +56,7 @@ neural_network_model.fit(X_train=X_train,
                          verbose=50)
 toc = time.time()
 gap = toc-tic
-print(f'The decision-tree-zhoumath-with-null-zhoumath model is bulit in {gap:.4f} seconds.')
+print(f'The neural-network-zhoumath-with-null-zhoumath model is bulit in {gap:.4f} seconds.')
 
 # Predict
 X_test = np.array(X_test)
@@ -64,11 +64,11 @@ tic = time.time()
 y_test_pred = neural_network_model.predict(X_test)[:, 1]
 toc = time.time()
 gap = toc-tic
-print(f'The decision-tree-with-null-zhoumath model is predicted in {gap:.44f} seconds.')
+print(f'The neural-network-zhoumath model is predicted in {gap:.4f} seconds.')
 auc_score = roc_auc_score(y_test, y_test_pred)
 fpr, tpr, _ = roc_curve(y_test, y_test_pred)
 ks = tpr[abs(tpr - fpr).argmax()] - fpr[abs(tpr - fpr).argmax()]
-print(f"KS = {ks:.3f}\nAUC = {auc_score:.4f}")
+print(f"KS = {ks:.4f}\nAUC = {auc_score:.4f}")
 
 # Plot ROC Curve
 plt.plot(fpr, fpr, label="Random Guess")
