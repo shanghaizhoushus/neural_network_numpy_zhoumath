@@ -1,10 +1,10 @@
-# Neural Network Numpy Zhoumath - Zhoushus (v0.1.2)
+# Neural Network Numpy Zhoumath - Zhoushus (v0.1.3)
 
 This repository contains a custom implementation of nerual network for binary classification using Numpy which includes practical examples for applying the model to real-world datasets.
 
 ## Features
 - **Custom Neural Network Implementation**: A nerual network model implemented with Numpy, allowing for a deeper understanding of machine learning fundamentals.
-- **Optimization Techniques**: Supports kaiming initialization, mini-batch gradient descent, early stopping, learning rate decay, and the Adam optimizer for better performance during training.
+- **Optimization Techniques**: Supports kaiming initialization, mini-batch gradient descent, early stopping, learning rate decay, dropout, and the Adam optimizer for better performance during training.
 - **Example Usage**: A comprehensive example script that demonstrates how to use the model on a real-world dataset from `sklearn`.
 
 ## Project Structure
@@ -50,6 +50,7 @@ The main implementation can be found in the `scripts/logistic_regression_zhoumat
 - **Learning Rate Decay**: Gradually reduces the learning rate to improve convergence.
 - **Early Stopping**: Stops training if validation performance does not improve for a set number of iterations.
 - **Adam Optimizer**: An implementation of the Adam optimization algorithm to enhance model training.
+- **Dropout**: Dropout for each linear layer is added to avoid overfitting.
 
 ## Dependencies
 The project requires the following dependencies, which are listed in `requirements.txt`:
@@ -64,7 +65,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Contributions are welcome! Please feel free to submit a Pull Request or open an issue for improvements or bug fixes.
 
 ## Version
-Current version: **0.1.2**
+Current version: **0.1.3**
 
 ## Author
 - **Zhoushus**

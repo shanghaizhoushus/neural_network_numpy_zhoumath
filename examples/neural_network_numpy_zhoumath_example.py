@@ -40,11 +40,13 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 # Fit model
 learning_rate = 0.001
 n_iters = 10000
+dim_hiddens = [128, 64]
+dropout_rate = 0.2
 batch_size = 256
-dim_hiddens = [256, 128, 32]
 neural_network_model = NeuralNetworkNumpyZhoumath(learning_rate=learning_rate,
                                                   n_iters=n_iters,
                                                   dim_hiddens=dim_hiddens,
+                                                  dropout_rate=dropout_rate,
                                                   batch_size=batch_size)
 tic = time.time()
 neural_network_model.fit(X_train=X_train,
@@ -52,7 +54,7 @@ neural_network_model.fit(X_train=X_train,
                          X_val=X_val,
                          y_val=y_val,
                          early_stop_rounds = 100,
-                         decay_rounds = 10,
+                         decay_rounds=10,
                          verbose=50)
 toc = time.time()
 gap = toc-tic

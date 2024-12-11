@@ -39,7 +39,8 @@ class Earlystopper:
     Methods:
     --------
     _evaluate_early_stop(model, X_train, y_train, X_val, y_val)
-        Evaluates the model's performance on the training and validation sets, triggering early stopping or learning rate decay if necessary.
+        Evaluates the model's performance on the training and validation sets,
+        triggering early stopping or learning rate decay if necessary.
     """
     def __init__(self, early_stop_rounds, n_iters, decay_rounds, verbose):
         """
@@ -75,10 +76,10 @@ class Earlystopper:
         self.current_round += 1
         self.current_early_stop_rounds += 1
         self.current_decay_rounds += 1
-        _, _, train_logodds = model._forward(X_train)
+        _, _, _, train_logodds = model._forward(X_train, 0)
         train_predicts = 1 / (1 + np.exp(-train_logodds))
         train_auc = roc_auc_score(y_train, train_predicts)
-        _, _, val_logodds = model._forward(X_val)
+        _, _, _, val_logodds = model._forward(X_val, 0)
         val_predicts = 1 / (1 + np.exp(-val_logodds))
         val_auc = roc_auc_score(y_val, val_predicts)
         
@@ -117,6 +118,7 @@ class Earlystopper:
             return self.linears_cache, self.biases_cache
         
         return None, None
+    
 
 class AdamOptimizer:
     """
